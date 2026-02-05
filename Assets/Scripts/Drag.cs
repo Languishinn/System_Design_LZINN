@@ -1,9 +1,18 @@
 using UnityEngine;
-using UnityEngine.EventSystems; // 必须引用
+using UnityEngine.EventSystems;
 
 public class Drag: MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     private Vector3 offset;
+    private Vector3 initialPosition; // 记录初始位置
+    private CanvasGroup canvasGroup;
+
+    void Start()
+    {
+        // 游戏开始时记录最初的位置
+        initialPosition = transform.position;
+        canvasGroup = gameObject.GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
+    }
 
     // 当鼠标/手指按下开始拖拽时
     public void OnBeginDrag(PointerEventData eventData)
@@ -14,7 +23,10 @@ public class Drag: MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandl
         offset = transform.position - mousePos;
         
         // 可以在这里改变透明度或缩放，给予视觉反馈
-        GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.7f);
+        GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.8f);
+
+        //让射线穿透，使其他物件接受射线信号
+        canvasGroup.blocksRaycasts = false;
     }
 
     // 拖拽进行中
@@ -31,5 +43,12 @@ public class Drag: MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandl
     {
         // 恢复视觉效果
         GetComponent<SpriteRenderer>().color = Color.white;
+        // 回到初始位置
+        // 如果 eventData.pointerEnter 为空，说明没丢在任何带 Collider 的物体上
+        if (eventData.pointerEnter == null || !eventData.pointerEnter.CompareTag("Target"))
+        {
+            transform.position = initialPosition;
+            Debug.Log("No interactive events");
+        }
     }
 }
