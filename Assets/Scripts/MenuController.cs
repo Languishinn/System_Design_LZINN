@@ -28,8 +28,6 @@ public void ShowTargetMenu(GameObject target)
     if (backgroundMask != null)
     {
         backgroundMask.SetActive(true);
-        // 暴力检查：确保它的 alpha 和 scale 在运行时没被别人改掉
-        Debug.Log("Mask 已激活，当前层级位置: " + backgroundMask.transform.GetSiblingIndex());
     }
     else
     {
