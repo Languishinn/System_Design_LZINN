@@ -1,31 +1,38 @@
-
-
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.EventSystems; // 必须引用
 
-// 继承 IPointerClickHandler 接口
-public class ClickObject : MonoBehaviour, IPointerClickHandler
+// 继承这些接口，让 Sprite 像按钮一样工作
+public class ClickObject : MonoBehaviour, IPointerClickHandler//,IBeginDragHandler, IDragHandler, IEndDragHandler 
 {
-    public MenuController menuController;
-    public GameObject TargetInterface;
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        // eventData.button 可以判断是左键还是右键
+    
+    public enum ObjectType { Bell, Key, Menu, MenuFood}
+    public ObjectType type;
+
+    public void OnPointerClick(PointerEventData eventData) {
         if (eventData.button == PointerEventData.InputButton.Left)
         {
             Debug.Log(gameObject.name + " clicked");
-            // 在这里写打开菜单的代码
-            ActiveInterface();
+            switch (type) {
+                case ObjectType.Bell:
+                    Debug.Log("这是铃铛，呼叫客人...");
+                    InnManager.Instance.OnBellRung();
+                    break;
+                case ObjectType.Key:
+                    Debug.Log("这是钥匙，准备拖拽...");
+                    break;
+                case ObjectType.MenuFood:
+                    Debug.Log("这是菜单上的菜...");
+                    break;
+                case ObjectType.Menu:
+                    Debug.Log("clicked the menu");
+                    MenuClicked mc = GetComponent<MenuClicked>();
+                    if (mc != null) {
+                        mc.ActiveInterface();
+                    } else {
+                        Debug.LogWarning(gameObject.name + " 上没挂 MenuClicked 脚本！");
+                    }
+                    break;
+            }
         }
-    }
-
-    void ActiveInterface()
-    {
-        if (menuController != null)
-        {
-            menuController.ShowTargetMenu(TargetInterface);
-            Debug.Log( TargetInterface+ "active");
-        }
-          
     }
 }
